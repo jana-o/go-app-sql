@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"code/go-app-sql/models"
+	"code/plant-diary/models"
 	"database/sql"
 	"io"
 	"os"
+	"strconv"
 
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo"
 )
@@ -17,26 +17,6 @@ type H map[string]interface{}
 func GetPhotos(db *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return c.JSON(http.StatusOK, models.GetPhotos(db))
-	}
-}
-
-func UpdatePhoto(db *sql.DB) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		var photo models.Photo
-
-		c.Bind(&photo)
-
-		index, _ := strconv.Atoi(c.Param("index"))
-
-		id, err := models.UpdatePhoto(db, index, photo.Src)
-
-		if err == nil {
-			return c.JSON(http.StatusCreated, H{
-				"affected": id,
-			})
-		}
-
-		return err
 	}
 }
 
@@ -74,5 +54,17 @@ func UploadPhoto(db *sql.DB) echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, models.UploadPhoto(db, fsrc))
+	}
+}
+
+func DeletePhoto(db *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		photoId, _ := strconv.Atoi(c.Param("photoId"))
+
+		_, err := models.DeletePhoto(db, photoId)
+		if err == nil {
+			return c.JSON(http.StatusOK, H{"deleted": photoId})
+		}
+		return err
 	}
 }

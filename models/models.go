@@ -41,18 +41,20 @@ func GetPhotos(db *sql.DB) PhotoCollection {
 	return result
 }
 
-//UpdatePhoto updates existing photo in DB
-func UpdatePhoto(db *sql.DB, index int, src string) (int64, error) {
-	sql := "UPDATE photos SET (src) = (?) WHERE id = ?"
+//DeletePhoto deletes existing photo
+func DeletePhoto(db *sql.DB, photoId int) (int64, error) {
 
+	sql := "DELETE FROM photos WHERE id = ?"
+
+	//prepare statement
 	stmt, err := db.Prepare(sql)
 	if err != nil {
 		panic(err)
 	}
-
 	defer stmt.Close()
 
-	result, err2 := stmt.Exec(src, index)
+	//replace ? with id
+	result, err2 := stmt.Exec(photoId)
 	if err2 != nil {
 		panic(err2)
 	}
@@ -89,5 +91,4 @@ func UploadPhoto(db *sql.DB, fsrc string) Photo {
 
 	return photo
 
-	// return result.RowsAffected()
 }

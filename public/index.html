@@ -1,90 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-    />
 
-    <title>Planting diary</title>
-    <style type="text/css">
-      #app img {
-        max-width: 100%;
-      }
-      .image-row {
-        margin: 5px 0;
-      }
-      .container {
-        padding: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Planting diary</a>
-      </nav>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 
-      <div class="container">
-        <h3>Create your planting diary.</h3>
-        <br />
-        <input
-          type="file"
-          id="photoFile"
-          ref="myFiles"
-          @change="upload"
-          name="file"
-        /><br />
-        <button class="btn btn-default">
-          Update
-        </button>
+  <title>Planting diary</title>
+  <style type="text/css">
+    #app img {
+      max-width: 100%;
+    }
+
+    .image-row {
+      margin: 5px 0;
+    }
+
+    .container {
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Planting diary</a>
+    </nav>
+
+    <div class="container">
+      <h3>Create your planting diary</h3>
+      <br />
+      <input type="file" id="photoFile" ref="myFiles" @change="upload" name="file" /><br />
+    </div>
+
+    <div class="container">
+      <div class="row justify-content-md-left" id="loading" v-if="loading">
+        <div class="col-md-6"></div>
+        <div class="col-md-6"></div>
       </div>
 
-      <div class="container">
-        <div class="row justify-content-md-left" id="loading" v-if="loading">
-          <div class="col-md-6"></div>
-          <div class="col-md-6"></div>
-        </div>
-
-        <div
-          class="row justify-content-md-left image-row"
-          v-for="photo in photos"
-        >
-          <div class="col-md-6">
-            <img class="thumbnail" :src="photo.src" alt="" />
-          </div>
+      <div class="row justify-content-md-left image-row" v-for="photo in photos">
+        <div class="col-md-6">
+          <img class="thumbnail" :src="photo.src" alt="photo.src" />
+          <p>{{ photo.photoId }}</p>
+          <button class="btn btn-danger" v-on:click="deleteTask(photo.photoId)"><i class="fa fa-trash-o"
+              aria-hidden="true"></i></button>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
-    <script type="text/javascript">
-      var app = new Vue({
-        el: "#app",
-        data: {
-          photos: [],
-          loading: true
-        },
-        mounted() {
-          axios.get("/photos").then(res => {
-            this.loading = false;
-            this.photos = res.data.items ? res.data.items : [];
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script type="text/javascript">
+    var app = new Vue({
+      el: "#app",
+      data: {
+        photos: [],
+        loading: true,
+      },
+      mounted() {
+        axios.get("/photos").then(res => {
+          this.loading = false;
+          this.photos = res.data.items ? res.data.items : [];
+        });
+      },
+      methods: {
+        upload: function () {
+          let data = new FormData();
+          data.append("file", this.$refs.myFiles.files[0]);
+
+          axios.post("/photos", data).then(res => {
+            console.log(res);
           });
         },
-        methods: {
-          upload: function() {
-            let data = new FormData();
-            data.append("file", this.$refs.myFiles.files[0]);
 
-            axios.post("/photos", data).then(res => {
-              console.log(res);
-            });
-          }
+        deleteTask: function (index) {
+          axios.delete("/photos/" + index).then(res => {
+            console.log(res)
+          })
         }
-      });
-    </script>
-  </body>
+      }
+    });
+  </script>
+</body>
+
 </html>

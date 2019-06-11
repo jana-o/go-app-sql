@@ -1,7 +1,7 @@
 package main
 
 import (
-	"code/go-app-sql/handlers"
+	"code/plant-diary/handlers"
 	"database/sql"
 
 	"github.com/labstack/echo"
@@ -35,19 +35,10 @@ func main() {
 	// HTTP routes
 	e.File("/", "public/index.html")
 	e.GET("/photos", handlers.GetPhotos(db))
-	e.PUT("/photos/:index", handlers.UpdatePhoto(db))
 	e.POST("/photos", handlers.UploadPhoto(db))
+	e.DELETE("/photos/:photoId", handlers.DeletePhoto(db))
 	e.Static("/uploads", "public/uploads")
 
-	//routes without handlers
-	// e.GET("/photos", func(c echo.Context) error {
-	// 	return c.JSON(200, "GET Photos")
-	// })
-	// e.PUT("/photos", func(c echo.Context) error {
-	// 	return c.JSON(200, "Update Photos")
-	// })
-
-	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
